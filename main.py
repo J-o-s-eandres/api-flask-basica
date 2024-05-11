@@ -1,6 +1,5 @@
 import logging
 from flask import Flask, jsonify, request
-from data import users
 from sql.operations import create_user, get_users_actives, get_user_active, delete_user, update_user
 
 # Configurar el logger
