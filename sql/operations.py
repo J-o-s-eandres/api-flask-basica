@@ -2,7 +2,6 @@ from sqlalchemy.orm import sessionmaker
 from .database import engine, User
 from flask import jsonify
 
-
 Session = sessionmaker(bind=engine)
 
 def create_user(data):
@@ -72,3 +71,4 @@ def delete_user(user_id):
 
     finally:
         session.close()
+
