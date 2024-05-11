@@ -4,7 +4,7 @@ from data import users
 from sql.operations import create_user, get_users_actives, get_user_active, delete_user
 
 # Configurar el logger
-logging.basicConfig(filename='logs/app.log',level=logging.INFO)
+logging.basicConfig(filename='logs/app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
