@@ -2,15 +2,12 @@ from flask import Flask,jsonify,request
 from data import users
 import os
 
-from sql.operations import create_user, get_users_actives
+from sql.operations import create_user, get_users_actives,get_user_active, delete_user
 
-
-#levantar servicio
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def get_users():
-    # Obtener los valores de page y per_page de la solicitud del cliente
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 20))
 
@@ -25,20 +22,26 @@ def get_users():
 
 
 
-@app.route('/<int:id_user>',methods=['GET'])
-def get_user(id_user):#lista a todos los usuarios hasta que le pases el /num_id del usuario que buscas 
-    return jsonify(
-        [i for i in users if i['id'] == id_user]
-    )
+@app.route('/<int:user_id>',methods=['GET'])
+def get_user(user_id):
+    
+    user = get_user_active(user_id)
+
+    if not user:
+        return jsonify({"message": "No hay usuarios con ese id"}), 404
+    else:
+        user_data = {"id": user.id, "name": user.name, "apellido": user.apellido, "correo": user.correo, "status": user.status}
+        return jsonify(user_data)
+
 
 #POST 
 @app.route('/', methods= ['POST'])
 def add_user():
-   data = request.json  # Obtener los datos del cuerpo de la solicitud
+   data = request.json 
    if not data:
        return jsonify({"error": "No se proporcionaron datos"}), 400
 
-   success = create_user(data)  # Llamar a la función create_user con los datos recibidos
+   success = create_user(data) 
    if success:
         return jsonify({"Mensaje": "Usuario agregado satisfactoriamente"}), 201
    else:
@@ -70,20 +73,22 @@ def update_user(id_user):
 
     
 #DELETE
-@app.route('/<int:id_user>', methods=['DELETE'])
-def delete_user(id_user):
-    # Buscar el usuario por ID
-    for user in users:
-        if user['id'] == id_user:
-            # Eliminar el usuario encontrado
-            users.remove(user)
-            return jsonify({
-                "Mensaje": "Usuario Eliminado",
-                "Usuarios": users
-            })
-    
-    # Si el usuario no fue encontrado
-    return "Usuario no encontrado"
+@app.route('/user_delete/', methods=['PUT'])
+def delete_user_route():
+    try:
+        if not request.json:
+            return jsonify({"message": "La solicitud debe contener datos JSON"}), 400
+
+        if 'user_id' not in request.json:
+            return jsonify({"message": "Se requiere 'user_id' en los datos JSON"}), 400
+        
+        user_id = request.json['user_id']
+        
+        result, status_code = delete_user(user_id)
+        return result, status_code
+    except Exception as e:
+        return jsonify({"message": f"Error en la solicitud: {str(e)}"}), 500
+
 
 
 
