@@ -72,3 +72,42 @@ def delete_user(user_id):
     finally:
         session.close()
 
+def update_user(user_id, new_data):
+    session = Session()
+
+    try:
+        user = get_user_active(user_id)
+
+        if not user:
+            return jsonify({"message": "No se encontró usuario para actualizar"}), 404
+
+        # Verificar si el nuevo correo electrónico ya está registrado en otro usuario
+        new_email = new_data.get("correo")
+        if new_email and new_email != user.correo:
+            existing_user = session.query(User).filter(User.correo == new_email).first()
+            if existing_user:
+                return jsonify({"message": "El correo electrónico ya está registrado en otro usuario"}), 400
+
+        # Actualizar los datos del usuario
+        user.name = new_data.get("name", user.name)
+        user.apellido = new_data.get("apellido", user.apellido)
+        user.correo = new_email or user.correo  # Usar el nuevo correo o mantener el existente
+        session.merge(user)
+        session.commit()
+
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "apellido": user.apellido,
+            "correo": user.correo,
+            "status": user.status
+        }
+
+        return jsonify({"message": "Usuario actualizado", "usuario": user_data}), 200
+
+    except Exception as e:
+        session.rollback()
+        return jsonify({"message": f"Error al actualizar el usuario: {str(e)}"}), 500
+
+    finally:
+        session.close()

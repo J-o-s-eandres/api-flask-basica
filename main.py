@@ -1,7 +1,7 @@
 import logging
 from flask import Flask, jsonify, request
 from data import users
-from sql.operations import create_user, get_users_actives, get_user_active, delete_user
+from sql.operations import create_user, get_users_actives, get_user_active, delete_user, update_user
 
 # Configurar el logger
 logging.basicConfig(filename='logs/app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -58,30 +58,22 @@ def add_user():
         logger.error(f"Error al agregar usuario: {str(e)}")
         return jsonify({"message": "Error al agregar usuario"}), 500
 
-@app.route('/<int:id_user>', methods=['PUT'])
-def update_user(id_user):
+@app.route('/user_update/<int:user_id>', methods=['PUT'])
+def update_user_route(user_id):
     try:
-        obj_user = [i for i in users if i['id'] == id_user]
+        # Obtener los nuevos datos del usuario del cuerpo de la solicitud JSON
+        new_user_data = request.json
+        
+        print(new_user_data)
+        # Llamar a la función update_user para actualizar el usuario en la base de datos
+        result, status_code = update_user(user_id, new_user_data)
+        
+        # Devolver el resultado y el código de estado
+        return result, status_code
 
-        if len(obj_user) > 0:
-            users.remove(obj_user)
-            obj_user = {
-                "id": request.json['id'], 
-                "name": request.json['name'],
-                "apellido": request.json['apellido'],
-                "edad": request.json['edad'],
-                "correo": request.json['correo'],
-                "status": request.json['status']       
-            }
-
-            users.append(obj_user)
-            logger.info(f"Usuario con ID {id_user} actualizado")
-            return jsonify({
-                "Mensaje": "Usuario actualizado",
-                "Usuario": obj_user
-            })
     except Exception as e:
-        logger.error(f"Error al actualizar usuario con id {id_user}: {str(e)}")
+        # Manejar cualquier error y devolver un mensaje de error y código de estado 500
+        logger.error(f"Error al actualizar usuario con ID {user_id}: {str(e)}")
         return jsonify({"message": "Error al actualizar usuario"}), 500
 
 @app.route('/user_delete/', methods=['PUT'])
