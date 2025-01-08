@@ -10,21 +10,29 @@ Configurar el logger
 logging.basicConfig(filename='logs/app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 """
-# Verificar y crear la carpeta 'logs' si no existe
+
+# Ruta para los logs
 log_dir = 'logs'
+log_file = os.path.join(log_dir, 'sql.log')
+
+# Verificar y crear el directorio si no existe
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
+# Configurar el manejador de archivos
+file_handler = logging.FileHandler(log_file)
+file_handler.setLevel(logging.INFO)
+
 # Configurar el logger
 logging.basicConfig(
-    filename=os.path.join(log_dir, 'app.log'),
+    handlers=[file_handler],
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
 logger = logging.getLogger(__name__)
 
-# Ejemplo de uso
-logger.info("El logger ha sido configurado correctamente.")
+logger.info("Logger configurado correctamente.")
 
 app = Flask(__name__)
 
