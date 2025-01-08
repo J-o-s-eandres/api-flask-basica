@@ -1,10 +1,29 @@
+import os
 import logging
 from flask import Flask, jsonify, request
 from sql.operations import create_user, get_users_actives, get_user_active, delete_user, update_user
 
-# Configurar el logger
+
+
+/*Configurar el logger
 logging.basicConfig(filename='logs/app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)*/
+
+# Verificar y crear la carpeta 'logs' si no existe
+log_dir = 'logs'
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Configurar el logger
+logging.basicConfig(
+    filename=os.path.join(log_dir, 'app.log'),
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# Ejemplo de uso
+logger.info("El logger ha sido configurado correctamente.")
 
 app = Flask(__name__)
 
