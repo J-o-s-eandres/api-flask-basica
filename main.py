@@ -5,10 +5,11 @@ from sql.operations import create_user, get_users_actives, get_user_active, dele
 
 
 
-/*Configurar el logger
+""" 
+Configurar el logger
 logging.basicConfig(filename='logs/app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)*/
-
+logger = logging.getLogger(__name__)
+"""
 # Verificar y crear la carpeta 'logs' si no existe
 log_dir = 'logs'
 if not os.path.exists(log_dir):
